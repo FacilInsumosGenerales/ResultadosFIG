@@ -1,7 +1,8 @@
 from conexion import conectarseABaseDeDatos
 import pandas as pd
 
-
+# anadir nombre de empresa y ruc
+# añadir saldo
 def conseguirDataAdministracion(start_date, end_date):
     query = """
         SELECT 
@@ -34,3 +35,14 @@ def conseguirDataAdministracion(start_date, end_date):
     result = cursor.fetchall()
     connection.close()
     return pd.DataFrame(result)
+
+
+###Clientes
+# saldo = facturas - abonos
+# fecha de vencimiento de facturas
+# fecha de emision de factura
+# fecha de envio de factura
+# nombre del cliente
+# numero de oc cliente
+
+###

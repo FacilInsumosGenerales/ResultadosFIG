@@ -31,4 +31,5 @@ if st.button("Consultar Datos"):
         if data.empty:
             st.warning("No se encontraron datos en el rango de fechas seleccionado.")
         else:
+            st.header('Control de pago a proveedores')
             st.dataframe(data)
