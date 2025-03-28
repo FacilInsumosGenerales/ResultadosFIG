@@ -33,3 +33,6 @@ if st.button("Consultar Datos"):
         else:
             st.header('Control de pago a proveedores')
             st.dataframe(data["Proveedores"])
+
+            st.header('Control de pago a clientes')
+            st.dataframe(data["Clientes"])
