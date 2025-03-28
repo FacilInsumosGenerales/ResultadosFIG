@@ -9,7 +9,7 @@ def conseguirDataAdministracion(start_date, end_date):
 
     dataProveedores = conseguirControlProveedores(start_date, end_date, cursor)
     dataClientes = conseguirControlClientes(start_date, end_date, cursor)
-    dataGuias = []
+    dataGuias = conseguirControlGuias(start_date, end_date, cursor)
 
     cursor.close()
     connection.close()
@@ -128,11 +128,34 @@ def conseguirControlClientes(start_date, end_date,cursor):
 
     dataCompleta = conseguirSaldo(result)
     return pd.DataFrame(dataCompleta)
-# saldo = facturas - abonos
-# fecha de vencimiento de facturas
-# fecha de emision de factura
-# fecha de envio de factura
-# nombre del cliente
-# numero de oc cliente
 
-###
+### Guias
+def conseguirControlGuias(start_date, end_date,cursor):
+    query = """
+        SELECT 
+            oc.TRAZA TRAZA_OC_Cliente,
+            oc.Numero_OC_Cliente OC_cliente,
+            req.Cod_Req,
+            e.Nombre Nombre_cliente,
+            oc.Fecha_Emision Fecha_OC_Cliente,
+            g.Numero_Guia,
+            g.*
+            
+
+        FROM datos_generales_ocs_clientes oc
+        LEFT JOIN datos_generales_de_cotizaciones cot ON cot.TRAZA = oc.Numero_de_Cotizacion
+        LEFT JOIN datos_generales_del_proceso req ON req.TRAZA = cot.Cod_Req
+        LEFT JOIN contactos cont ON cont.TRAZA = req.Contacto_Cliente
+        LEFT JOIN empresas e ON e.TRAZA = cont.Empresa
+        LEFT JOIN guias_emitidas g ON g.OC_de_cliente = oc.TRAZA
+
+
+        WHERE oc.Fecha_Emision BETWEEN %s AND %s
+
+    """
+
+    cursor.execute(query, (start_date, end_date))
+    result = cursor.fetchall()
+    print(result)
+
+    return pd.DataFrame(result)

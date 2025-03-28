@@ -36,3 +36,6 @@ if st.button("Consultar Datos"):
 
             st.header('Control de pago a clientes')
             st.dataframe(data["Clientes"])
+
+            st.header('Control de guias')
+            st.dataframe(data["Guias"])
