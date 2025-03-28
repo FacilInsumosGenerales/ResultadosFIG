@@ -1,0 +1,39 @@
+altair==5.5.0
+attrs==25.3.0
+blinker==1.9.0
+Bottleneck @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_33wnmqdh9g/croot/bottleneck_1731058648266/work
+cachetools==5.5.2
+certifi==2025.1.31
+charset-normalizer==3.4.1
+click==8.1.8
+gitdb==4.0.12
+GitPython==3.1.44
+idna==3.10
+Jinja2==3.1.6
+jsonschema==4.23.0
+jsonschema-specifications==2024.10.1
+MarkupSafe==3.0.2
+mysql-connector-python @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_b9q4_ym7fn/croot/mysql-connector-python_1742998762640/work/mysql-connector-python
+narwhals==1.32.0
+numexpr @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_ffj5ghzq2u/croot/numexpr_1730215943719/work
+numpy @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_b7iptlxgej/croot/numpy_and_numpy_base_1708638622773/work/dist/numpy-1.26.4-cp39-cp39-macosx_10_9_x86_64.whl#sha256=dccaeb68b46dfe4f1a77e1233a1ec88f7b588f1891be156d87e60c1078b6ff83
+packaging==24.2
+pandas @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_d6o0iypzho/croot/pandas_1732735102618/work/dist/pandas-2.2.3-cp39-cp39-macosx_10_15_x86_64.whl#sha256=05b82384a7832d87152355b223dbbaded729e92e2417a41b83b4839afdcd758a
+pillow==11.1.0
+protobuf @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_0aksusx5xk/croot/protobuf_1742419713773/work/bazel-bin/python/dist/protobuf-5.29.3-cp39-abi3-macosx_10_13_x86_64.whl#sha256=6726cd862a95b8713ead5ab2c9bf6d0e01a23736b6ad43b531283a13e3bb76a0
+pyarrow==19.0.1
+pydeck==0.9.1
+python-dateutil @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_efk5_uakg8/croot/python-dateutil_1716495742183/work
+pytz @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_244ln7biq9/croot/pytz_1713974320727/work
+referencing==0.36.2
+requests==2.32.3
+rpds-py==0.24.0
+six @ file:///tmp/build/80754af9/six_1644875935023/work
+smmap==5.0.2
+streamlit==1.44.0
+tenacity==9.0.0
+toml==0.10.2
+tornado==6.4.2
+typing_extensions==4.13.0
+tzdata @ file:///croot/python-tzdata_1690578112552/work
+urllib3==2.3.0
