@@ -28,8 +28,8 @@ if st.button("Consultar Datos"):
         # Obtener los datos y mostrarlos en una tabla
         data = conseguirDataAdministracion(str(start_date), str(end_date))
         
-        if data.empty:
+        if data["Proveedores"].empty:
             st.warning("No se encontraron datos en el rango de fechas seleccionado.")
         else:
             st.header('Control de pago a proveedores')
-            st.dataframe(data)
+            st.dataframe(data["Proveedores"])

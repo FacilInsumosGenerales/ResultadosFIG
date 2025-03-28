@@ -1,9 +1,29 @@
 from conexion import conectarseABaseDeDatos
 import pandas as pd
 
-# anadir nombre de empresa y ruc
-# añadir saldo
+
 def conseguirDataAdministracion(start_date, end_date):
+    connection = conectarseABaseDeDatos()
+    cursor = connection.cursor(dictionary=True)
+
+
+    dataProveedores = conseguirControlProveedores(start_date, end_date, cursor)
+    dataClientes = []
+    dataGuias = []
+
+    cursor.close()
+    connection.close()
+
+    return {
+        "Proveedores": dataProveedores,
+        "Clientes": dataClientes,
+        "Guias": dataGuias
+    }
+
+
+
+# anadir nombre de empresa y ruc
+def conseguirControlProveedores(start_date, end_date,cursor):
     query = """
         SELECT 
             mb.Concepto Concepto_pago,
@@ -12,9 +32,10 @@ def conseguirDataAdministracion(start_date, end_date):
             mb.Moneda Moneda_pago,
             mb.No_Operacion_Bancaria,
             mb.Ediciones Ediciones_pago,
-            cp.Proveedor,
-            cp.OC_cliente,
-            cp.OC_proveedor,
+            oc.No_Orden_de_Compra OC_proveedor,
+            oc.Fecha_actualizacion Fecha_OC_proveedor,
+            e.Nombre Nombre_proveedor,
+            e.RUC,
             cp.TRAZA TRAZA_factura,
             cp.Numero_de_documento,
             cp.Fecha_Emision,
@@ -27,15 +48,15 @@ def conseguirDataAdministracion(start_date, end_date):
         FROM movimientos_bancarios mb
         LEFT JOIN pagos_relacionados pr ON mb.TRAZA = pr.Movimiento
         LEFT JOIN comprobantes_de_pago cp ON cp.TRAZA = pr.Comprobante
+        LEFT JOIN empresas e ON e.TRAZA = cp.Proveedor 
+        INNER JOIN datos_generales_orden_compra_a_proveedores oc ON oc.TRAZA = cp.OC_proveedor 
         WHERE mb.Fecha BETWEEN %s AND %s
         GROUP BY mb.TRAZA;
     """
 
-    connection = conectarseABaseDeDatos()
-    cursor = connection.cursor(dictionary=True)
     cursor.execute(query, (start_date, end_date))
     result = cursor.fetchall()
-    connection.close()
+    
 
     dataCompleta = conseguirSaldo(result)
     return pd.DataFrame(dataCompleta)
@@ -62,6 +83,8 @@ def conseguirSaldo(data):
 
 
 ###Clientes
+# def conseguirControlClientes(start_date, end_date,cursor):
+
 # saldo = facturas - abonos
 # fecha de vencimiento de facturas
 # fecha de emision de factura
