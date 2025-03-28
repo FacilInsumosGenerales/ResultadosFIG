@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 
 
-st.title("ResultadosFIGsac")
+st.title("Resumen administración")
 
 today = datetime.today().date()
 one_month_ago = today - timedelta(days=30)
