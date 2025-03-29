@@ -25,10 +25,18 @@ def conseguirDataGeneral(start_date, end_date):
 # anadir nombre de empresa y ruc
 def conseguirFacturas(start_date, end_date,cursor):
     query = """
-        SELECT *
+        SELECT cp.*,
+        empProv.Nombre Nombre_proveedor,
+        empCli.Nombre Nombre_cliente
 
-        FROM comprobantes_de_pago comp
-        WHERE comp.Fecha_Emision BETWEEN %s AND %s
+        FROM comprobantes_de_pago cp
+        LEFT JOIN empresas empProv ON empProv.TRAZA = cp.Proveedor
+
+        LEFT JOIN datos_generales_ocs_clientes oc ON cp.OC_cliente = oc.TRAZA
+        LEFT JOIN contactos cont ON oc.Contacto_Cliente = cont.TRAZA
+        LEFT JOIN empresas empCli ON empCli.TRAZA = cont.Empresa
+        
+        WHERE cp.Fecha_Emision BETWEEN %s AND %s
     """
 
     cursor.execute(query, (start_date, end_date))
@@ -36,6 +44,8 @@ def conseguirFacturas(start_date, end_date,cursor):
     
 
     return pd.DataFrame(result)
+
+
 
 def calcularResultados(df):
 
