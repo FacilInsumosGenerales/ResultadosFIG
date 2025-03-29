@@ -1,3 +1,4 @@
+from decimal import Decimal
 from conexion import conectarseABaseDeDatos
 import pandas as pd
 
@@ -38,19 +39,17 @@ def conseguirFacturas(start_date, end_date,cursor):
 
 def calcularResultados(df):
 
-    TIPO_CAMBIO_USD_TO_PEN = 3.64
     
-    # Convertir valores en USD a PEN
-    # df.loc[df["Moneda"] == "USD", "Valor_sin_IGV"] = df.loc[df["Moneda"] == "USD", "Valor_sin_IGV"].apply(lambda x: x * TIPO_CAMBIO_USD_TO_PEN)
-    # df.loc[df["Moneda"] == "USD", "Moneda"] = "PEN"  # Actualizar moneda para referencia
+    df['Valor_sin_IGV'] = df['Valor_sin_IGV'].fillna(Decimal('0'))
+    TIPO_CAMBIO_USD_TO_PEN = Decimal('3.64')
+    df['Valor_soles'] = df.apply(lambda row: row['Valor_sin_IGV'] * TIPO_CAMBIO_USD_TO_PEN if row['Moneda'] == 'USD' else row['Valor_sin_IGV'], axis=1)
 
-
-    ventas_totales = df[df["Categoria"] == 0]["Valor_sin_IGV"].sum()
-    compras_totales = df[df["Categoria"] == 1]["Valor_sin_IGV"].sum()
+    ventas_totales = df[df["Categoria"] == 0]["Valor_soles"].sum()
+    compras_totales = df[df["Categoria"] == 1]["Valor_soles"].sum()
     resultado_ventas = ventas_totales - compras_totales
 
-    gastos_operacion = df[df["Categoria"].isin([2, 4])]["Valor_sin_IGV"].sum()
-    gastos_rrhh = df[df["Categoria"] == 3]["Valor_sin_IGV"].sum()
+    gastos_operacion = df[df["Categoria"].isin([2, 4])]["Valor_soles"].sum()
+    gastos_rrhh = df[df["Categoria"] == 3]["Valor_soles"].sum()
 
     resultados_totales = resultado_ventas - gastos_operacion - gastos_rrhh
 
