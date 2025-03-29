@@ -1,35 +1,37 @@
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, date
 from data.general import conseguirDataGeneral
 
 
-def configurar_fechas():
-    """Configura las fechas de inicio y final para la consulta."""
-    today = datetime.today().date()
-    one_month_ago = today - timedelta(days=30)
+def seleccionar_ano_mes():
     
-    start_date = st.date_input("Selecciona la fecha de inicio", value=one_month_ago)
-    end_date = st.date_input("Selecciona la fecha final", value=today)
+    hoy = datetime.today()
+    print('hoy', hoy)
     
-    return start_date, end_date
+    rango_anios = reversed(range(2000, hoy.year + 1))
+    
+    # Crear 2 columnas para la selección del año y el mes
+    col1, col2 = st.columns(2)
+
+    with col1:
+        anio_seleccionado = st.selectbox("Selecciona el año", rango_anios)
+
+    with col2:
+        mes_seleccionado = st.selectbox(
+            "Selecciona el mes",
+            list(range(1, 13)),  # Meses en forma de números
+            index=hoy.month - 1,  # Seleccionar el mes actual automáticamente (enero = índice 0)
+            format_func=lambda x: [
+                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            ][x - 1]
+        )
+    
+   
+    return anio_seleccionado, mes_seleccionado
 
 
-def validar_fechas(start_date, end_date):
-    """Valida que la fecha de inicio no sea posterior a la fecha final."""
-    if start_date > end_date:
-        st.error("La fecha de inicio no puede ser mayor que la fecha final.")
-        return False
-    return True
 
-  
-
-
-def mostrar_facturas(data):
-    """Muestra las facturas si existen; de lo contrario, muestra una advertencia."""
-    if data["Facturas"].empty:
-        st.warning("No se encontraron datos en el rango de fechas seleccionado.")
-    else:
-        st.dataframe(data["Facturas"])
 
 
 def mostrarMetricasFinancieras(data):
@@ -65,20 +67,19 @@ def llenarTarjeta(resultados,clave, objetivo = None, es_porcentaje=False):
 
 # Main code
 st.title("Resultados")
-start_date, end_date = configurar_fechas()
+anio_seleccionado, mes_seleccionado = seleccionar_ano_mes()
 
 if st.button("Consultar Datos"):
-    if validar_fechas(start_date, end_date):
-        st.write(f"Mostrando datos desde {start_date} hasta {end_date}")
 
-        data = conseguirDataGeneral(str(start_date), str(end_date))
+    data = conseguirDataGeneral(mes_seleccionado, anio_seleccionado)
 
-        
+    
 
-        st.header('Resultados financieros')
-        mostrarMetricasFinancieras(data)
+    st.header('Resultados financieros')
+    mostrarMetricasFinancieras(data)
 
-        
+    st.header('Clientes principales')
+    st.dataframe(data['Clientes principales'])
 
-        st.header('Facturas')
-        mostrar_facturas(data)
+    st.header('Facturas')
+    st.dataframe(data["Facturas"])
