@@ -37,7 +37,14 @@ def conseguirFacturas(start_date, end_date,cursor):
     return pd.DataFrame(result)
 
 def calcularResultados(df):
+
+    TIPO_CAMBIO_USD_TO_PEN = 3.64
     
+    # Convertir valores en USD a PEN
+    # df.loc[df["Moneda"] == "USD", "Valor_sin_IGV"] = df.loc[df["Moneda"] == "USD", "Valor_sin_IGV"].apply(lambda x: x * TIPO_CAMBIO_USD_TO_PEN)
+    # df.loc[df["Moneda"] == "USD", "Moneda"] = "PEN"  # Actualizar moneda para referencia
+
+
     ventas_totales = df[df["Categoria"] == 0]["Valor_sin_IGV"].sum()
     compras_totales = df[df["Categoria"] == 1]["Valor_sin_IGV"].sum()
     resultado_ventas = ventas_totales - compras_totales

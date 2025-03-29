@@ -21,10 +21,7 @@ def validar_fechas(start_date, end_date):
         return False
     return True
 
-
-def mostrar_mensaje_rango_fechas(start_date, end_date):
-    """Muestra un mensaje indicando el rango de fechas seleccionado."""
-    st.write(f"Mostrando datos desde {start_date} hasta {end_date}")
+  
 
 
 def mostrar_facturas(data):
@@ -32,40 +29,38 @@ def mostrar_facturas(data):
     if data["Facturas"].empty:
         st.warning("No se encontraron datos en el rango de fechas seleccionado.")
     else:
-        st.header('Facturas')
         st.dataframe(data["Facturas"])
 
 
-def mostrar_metricas_resultados(resultadosGenerales):
+def mostrarMetricasFinancieras(data):
     """Muestra métricas clave en columnas."""
-    st.header('Resultados ')
+    
+   
+    res = data['General']
     cols = st.columns(2)
     
     with cols[0]:
-        mostrar_metricas_financieras(resultadosGenerales, 
-                                    [
-                                        ("Ventas Totales", 'Ventas totales',False),
-                                        ("Resultado de Ventas", 'Resultado ventas',False),
-                                        ("Gastos de Operación", 'Gastos operacion',False),
-                                        ("Resultados Totales", 'Resultado total',False)
-                                    ])
+        llenarTarjeta(res,'Ventas totales', objetivo='S/. 216,666')
+        llenarTarjeta(res,'Resultado ventas', objetivo='S/. 47,666')
+        llenarTarjeta(res,'Gastos operacion')
+        llenarTarjeta(res,'Resultado total')
+
     with cols[1]:
-        mostrar_metricas_financieras(resultadosGenerales, 
-                                    [
-                                        ("Compras Totales", 'Compras totales',False),
-                                        ("Margen Bruto (GM)", 'GM', True),
-                                        ("Gastos de RRHH", 'Gastos RRHH',False),
-                                        ("Margen Bruto Total (GM Total)", 'GM total', True)
-                                    ])
 
+        llenarTarjeta(res,'Compras totales', objetivo='S/. 264,333')
+        llenarTarjeta(res,'GM', objetivo='22%',es_porcentaje=True)
+        llenarTarjeta(res,'Gastos RRHH')
+        llenarTarjeta(res,'GM total', es_porcentaje=True)
 
-def mostrar_metricas_financieras(resultados, metricas):
-    """Muestra métricas financieras en contenedores con nombres y claves proporcionadas."""
-    for nombre, clave, es_porcentaje in metricas:
-        valor = resultados[clave]
-        valor_formateado = f"{valor:.2%}" if es_porcentaje else f"${valor:,.2f}"
-        with st.container(border=True):
-            st.metric(nombre, valor_formateado)
+def llenarTarjeta(resultados,clave, objetivo = None, es_porcentaje=False):
+    valor = resultados[clave]
+    valor_formateado = f"{valor:.2%}" if es_porcentaje else f"S/. {valor:,.2f}"
+    with st.container(border=True):
+        st.metric(clave, valor_formateado)
+
+        if objetivo is not None:
+           st.caption(f"Objetivo: {objetivo}")
+       
 
 
 # Main code
@@ -74,7 +69,16 @@ start_date, end_date = configurar_fechas()
 
 if st.button("Consultar Datos"):
     if validar_fechas(start_date, end_date):
-        mostrar_mensaje_rango_fechas(start_date, end_date)
+        st.write(f"Mostrando datos desde {start_date} hasta {end_date}")
+
         data = conseguirDataGeneral(str(start_date), str(end_date))
+
+        
+
+        st.header('Resultados financieros')
+        mostrarMetricasFinancieras(data)
+
+        
+
+        st.header('Facturas')
         mostrar_facturas(data)
-        mostrar_metricas_resultados(data['General'])
