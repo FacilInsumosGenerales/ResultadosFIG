@@ -3,13 +3,19 @@ from conexion import conectarseABaseDeDatos
 import pandas as pd
 import seaborn as sns
 
+from data.utils import MESES_ESPANOL
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
+
+
 
 data = {
     "Fecha_Emision": pd.to_datetime([
         "2025-01-10", "2025-01-15", "2025-02-20", "2025-02-25",
         "2025-03-05", "2025-03-15", "2025-04-10", "2025-04-20"
     ]),
-    "Nombre_cliente": [
+    "Nombre_proveedor": [
         "Cliente A", "Cliente B", "Cliente A", "Cliente C",
         "Cliente B", "Cliente C", "Cliente A", "Cliente B"
     ],
@@ -26,15 +32,15 @@ def conseguirDataGeneral(mes, anio):
     connection.close()
 
     resultados = calcularResultados(dataFacturas,mes)
-
-    clientes = calcularClientesPrincipales(df_ejemplo,mes)
-
+    clientes = calcularClientesPrincipales(dataFacturas,mes)
+    proveedores = calcularProveedoresPrincipales(dataFacturas,mes)
 
 
     return {
         "Facturas": dataFacturas,
         "General":resultados,
-        "Clientes principales": clientes
+        "Clientes principales": clientes,
+        "Proveedores principales": proveedores
     }
 
 
@@ -69,7 +75,7 @@ def convertirASoles(df):
 
     return df
 
-
+# Primer diagrama
 def calcularResultados(df,mes):
 
     df["Fecha_Emision"] = pd.to_datetime(df["Fecha_Emision"])
@@ -101,17 +107,24 @@ def calcularResultados(df,mes):
 
 # Segundo diagrama
 def calcularClientesPrincipales(df, mes):
+    return calcularEntidadesPrincipales (df, mes, 'Nombre_cliente')
+
+def calcularProveedoresPrincipales(df, mes):
+    return calcularEntidadesPrincipales (df, mes, 'Nombre_proveedor')
+
+
+def calcularEntidadesPrincipales(df, mes, entidad):
     """Genera una tabla de totales mensuales por cliente, ordenada por un mes específico."""
     
-    df = df.dropna(subset=["Nombre_cliente"]).copy()
+    df = df.dropna(subset=[entidad]).copy()
     df["Fecha_Emision"] = pd.to_datetime(df["Fecha_Emision"])
     df["Mes"] = df["Fecha_Emision"].dt.month
 
     # Definir los 12 meses como columnas fijas
-    meses_completos = list(range(1, 13))
+    meses_completos = list(range(1, mes+1))
 
     # Crear tabla pivote
-    tabla = df.pivot_table(index="Nombre_cliente", columns="Mes", values="Valor_soles", aggfunc="sum", fill_value=0)
+    tabla = df.pivot_table(index=entidad, columns="Mes", values="Valor_soles", aggfunc="sum", fill_value=0)
     tabla = tabla.reindex(columns=meses_completos, fill_value=0) 
 
     # Agregar columna total por cliente 
@@ -122,11 +135,43 @@ def calcularClientesPrincipales(df, mes):
     tabla.loc["TOTAL"] = tabla.sum()
 
     # Calcular porcentaje de cliente
-    tabla["Porcentaje"] = (tabla[mes] / tabla.loc["TOTAL", mes] * 100) if mes in tabla else 0
+    tabla["Porcentaje"] = tabla[mes] / tabla.loc["TOTAL", mes] * 100
+    tabla["Porcentaje"] = tabla["Porcentaje"].apply(lambda x: f"{x:.2f}%")
+
+    # Diccionario para mapear números de mes a nombres en español
+    
+    mes_seleccionado = MESES_ESPANOL[mes]
+
+    # Renombrar las columnas numéricas a nombres de meses
+    tabla = tabla.rename(columns=MESES_ESPANOL)
+
+    # Cambiar el nombre de la columna 'Porcentaje' para incluir el mes seleccionado
+    tabla = tabla.rename(columns={"Porcentaje": f"Porcentaje {mes_seleccionado}"})
+
 
     # Estilizar columnas
-    mapaColores = sns.light_palette("#79C", as_cmap=True)  # Definir gradiente de color
-    tabla_estilizada = tabla.style.background_gradient(cmap=mapaColores, subset=[mes])
-   
+    mapaColores = sns.light_palette("#79C", as_cmap=True)  
+    colorSombra = mapaColores(0.5)
+
+    
+
+    tabla["Porcentaje Acumulado"] = (
+        tabla[f"Porcentaje {mes_seleccionado}"]
+        .str.rstrip("%") # Quita el símbolo '%'
+        .astype(float) # Convierte a número
+        .cumsum() # Calcula la suma acumulativa        
+    )
+
+    tabla_estilizada = (
+        tabla.style
+        .background_gradient(
+            cmap=mapaColores, subset=pd.IndexSlice[tabla.index[:-1], [mes_seleccionado]]
+        )
+        .map(
+            lambda _: f"background-color: {mcolors.rgb2hex(colorSombra)} ;",
+            subset=(tabla.index[tabla["Porcentaje Acumulado"] < 80], f"Porcentaje {mes_seleccionado}")
+        )
+    )
+
 
     return tabla_estilizada

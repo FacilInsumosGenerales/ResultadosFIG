@@ -1,12 +1,12 @@
 import streamlit as st
 from datetime import datetime, date
 from data.general import conseguirDataGeneral
+from data.utils import MESES_ESPANOL
 
 
 def seleccionar_ano_mes():
     
     hoy = datetime.today()
-    print('hoy', hoy)
     
     rango_anios = reversed(range(2000, hoy.year + 1))
     
@@ -73,13 +73,20 @@ if st.button("Consultar Datos"):
 
     data = conseguirDataGeneral(mes_seleccionado, anio_seleccionado)
 
-    
+    print(data['Clientes principales'])  # Ver el contenido
+    print(type(data['Clientes principales']))  # Ver si es DataFrame
+    print(data['Clientes principales'].columns)  # Ver qué columnas tiene
+
 
     st.header('Resultados financieros')
     mostrarMetricasFinancieras(data)
 
     st.header('Clientes principales')
-    st.dataframe(data['Clientes principales'])
+    st.dataframe(data['Clientes principales'], column_config= {"Porcentaje Acumulado" : None})
+
+    st.header('Proveedores principales')
+    st.dataframe(data['Proveedores principales'], column_config= {"Porcentaje Acumulado" : None})
+
 
     st.header('Facturas')
     st.dataframe(data["Facturas"])
