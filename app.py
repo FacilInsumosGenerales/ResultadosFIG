@@ -1,7 +1,6 @@
 import streamlit as st
 from datetime import datetime, date
-from data.general import conseguirDataGeneral
-from data.utils import MESES_ESPANOL
+from data.informeGeneral.general import conseguirDataGeneral
 
 
 def seleccionar_ano_mes():
@@ -73,10 +72,8 @@ if st.button("Consultar Datos"):
 
     data = conseguirDataGeneral(mes_seleccionado, anio_seleccionado)
 
-    print(data['Clientes principales'])  # Ver el contenido
-    print(type(data['Clientes principales']))  # Ver si es DataFrame
-    print(data['Clientes principales'].columns)  # Ver qué columnas tiene
-
+    st.write(data['1'])
+    st.write(data['2'])
 
     st.header('Resultados financieros')
     mostrarMetricasFinancieras(data)
