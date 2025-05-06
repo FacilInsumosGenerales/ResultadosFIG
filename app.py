@@ -72,9 +72,6 @@ if st.button("Consultar Datos"):
 
     data = conseguirDataGeneral(mes_seleccionado, anio_seleccionado)
 
-    st.write(data['1'])
-    st.write(data['2'])
-
     st.header('Resultados financieros')
     mostrarMetricasFinancieras(data)
 
@@ -87,3 +84,9 @@ if st.button("Consultar Datos"):
 
     st.header('Facturas')
     st.dataframe(data["Facturas"])
+
+    st.header('OC Clientes')
+    st.write(data['1'])
+
+    st.header('Cotizaciones')
+    st.write(data['2'])
